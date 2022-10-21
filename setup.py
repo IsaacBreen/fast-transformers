@@ -75,10 +75,7 @@ def _get_cpu_extra_compile_args():
 
 @lru_cache()
 def _get_gpu_extra_compile_args():
-    if torch.cuda.is_available():
-        return []
-    else:
-        return ["-arch=compute_60"]
+    return [] if torch.cuda.is_available() else ["-arch=compute_60"]
 
 
 def get_extensions():

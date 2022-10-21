@@ -41,22 +41,26 @@ class TestRecurrentTransformerDecoder(unittest.TestCase):
         ]
 
         for name, a1, a2, a3, a4 in tests:
-            dec = TransformerDecoder([
-                TransformerDecoderLayer(
-                    AttentionLayer(a1(), D, 4),
-                    AttentionLayer(a2(), D, 4),
-                    D
-                )
-                for i in range(4)
-            ])
-            rdec = RecurrentTransformerDecoder([
-                RecurrentTransformerDecoderLayer(
-                    RecurrentAttentionLayer(a3(), D, 4),
-                    RecurrentCrossAttentionLayer(a4(), D, 4),
-                    D
-                )
-                for i in range(4)
-            ])
+            dec = TransformerDecoder(
+                [
+                    TransformerDecoderLayer(
+                        AttentionLayer(a1(), D, 4), AttentionLayer(a2(), D, 4), D
+                    )
+                    for _ in range(4)
+                ]
+            )
+
+            rdec = RecurrentTransformerDecoder(
+                [
+                    RecurrentTransformerDecoderLayer(
+                        RecurrentAttentionLayer(a3(), D, 4),
+                        RecurrentCrossAttentionLayer(a4(), D, 4),
+                        D,
+                    )
+                    for _ in range(4)
+                ]
+            )
+
             dec.eval()
             rdec.eval()
             rdec.load_state_dict(dec.state_dict())
@@ -86,16 +90,19 @@ class TestRecurrentTransformerDecoder(unittest.TestCase):
         x = torch.rand(N, D)
         m = torch.rand(N, S, D)
 
-        rdec = RecurrentTransformerDecoder([
-            RecurrentTransformerDecoderLayer(
-                RecurrentAttentionLayer(RecurrentFullAttention(), D, 4),
-                RecurrentCrossAttentionLayer(
-                    RecurrentCrossFullAttention(), D, 4
-                ),
-                D
-            )
-            for i in range(4)
-        ])
+        rdec = RecurrentTransformerDecoder(
+            [
+                RecurrentTransformerDecoderLayer(
+                    RecurrentAttentionLayer(RecurrentFullAttention(), D, 4),
+                    RecurrentCrossAttentionLayer(
+                        RecurrentCrossFullAttention(), D, 4
+                    ),
+                    D,
+                )
+                for _ in range(4)
+            ]
+        )
+
         rdec(x, m)
 
 

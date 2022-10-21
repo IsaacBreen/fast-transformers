@@ -56,9 +56,11 @@ def sparse_product(Q, K, groups, topk, counts, lengths):
         s_queries, K, topk, sorted_g.view(N, H, L), counts, lengths
     )
     q_rev_flat = (sorted_rev_gi + q_offset).reshape(-1)
-    products = products_sorted.reshape(-1, k).index_select(
-        0, q_rev_flat).view(N, H, L, k)
-    return products
+    return (
+        products_sorted.reshape(-1, k)
+        .index_select(0, q_rev_flat)
+        .view(N, H, L, k)
+    )
 
 
 class TestSparseProductBackward(unittest.TestCase):
@@ -87,7 +89,7 @@ class TestSparseProductBackward(unittest.TestCase):
         I = 5
         B = 16
 
-        for i in range(30):
+        for _ in range(30):
             C = np.random.randint(10, 500)
             L = np.random.randint(C, 2000)
             E = np.random.randint(10, 128)
@@ -95,8 +97,7 @@ class TestSparseProductBackward(unittest.TestCase):
             k = np.random.randint(10, 64)
 
             if os.getenv("VEROSE_TESTS", ""):
-                print(("Testing Masked: N H L S E C k: "
-                       "{} {} {} {} {} {} {}").format(N, H, L, S, E, C, k))
+                print(f"Testing Masked: N H L S E C k: {N} {H} {L} {S} {E} {C} {k}")
 
             Q = torch.randn(N, H, L, E).to(self.device).requires_grad_(True)
             K = torch.randn(N, H, S, E).to(self.device).requires_grad_(True)
@@ -207,7 +208,7 @@ class TestSparseProductBackward(unittest.TestCase):
         I = 5
         B = 16
 
-        for exp in range(30):
+        for _ in range(30):
             C = np.random.randint(10, 500)
             L = np.random.randint(C, 2000)
             E = np.random.randint(10, 128)
@@ -215,8 +216,7 @@ class TestSparseProductBackward(unittest.TestCase):
             k = np.random.randint(10, 64)
 
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing: N H L S E C k: "
-                       "{} {} {} {} {} {} {}").format(N, H, L, S, E, C, k))
+                print(f"Testing: N H L S E C k: {N} {H} {L} {S} {E} {C} {k}")
 
             Q = torch.randn(N, H, L, E).to(self.device)
             K = torch.randn(N, H, S, E).to(self.device)
@@ -258,13 +258,11 @@ class TestSparseProductBackward(unittest.TestCase):
                 torch.abs(QK_selected - QK_selected_hat).max(),
                 1e-4
             )
-            i = 0
             for g1, g2 in zip(grad, grad_hat):
                 self.assertLess(
                     torch.abs(g1 - g2).max(),
                     1e-3
                 )
-                i += 1
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_backward(self):
@@ -283,7 +281,7 @@ class TestSparseProductBackward(unittest.TestCase):
         lengths = torch.full((N,), L, dtype=torch.int32).to(self.device)
 
         self._zero_grad(Q, K)
-        for i in range(100):
+        for _ in range(100):
             QK = torch.einsum("nhle,nhse->nhls", Q, K)
         self._zero_grad(Q, K)
 
@@ -322,7 +320,7 @@ class TestSparseProductBackward(unittest.TestCase):
         products = products_sorted.reshape(-1, k).index_select(
             0, q_rev_flat).view(N, H, L, k)
 
-        for i in range(100):
+        for _ in range(100):
             QK = clustered_sparse_dot_product(
                 s_queries, K, topk,
                 groups, counts,
@@ -344,8 +342,7 @@ class TestSparseProductBackward(unittest.TestCase):
         e.record()
         torch.cuda.synchronize()
         t_sparse = s.elapsed_time(e)
-        print("Benchmark Backward: T_Full: {}, T_Sparse: {}".format(
-            t_full, t_sparse))
+        print(f"Benchmark Backward: T_Full: {t_full}, T_Sparse: {t_sparse}")
 
 
 if __name__ == "__main__":

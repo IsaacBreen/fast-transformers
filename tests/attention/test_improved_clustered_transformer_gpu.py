@@ -21,21 +21,21 @@ class TestTransformerEncoder(unittest.TestCase):
     def test_full_attention_forward(self):
         d_model = 128
         n_heads = 4
-        transformer = TransformerEncoder([
-            TransformerEncoderLayer(
-                AttentionLayer(
-                    ImprovedClusteredAttention(
-                        clusters=10,
-                        topk=5
+        transformer = TransformerEncoder(
+            [
+                TransformerEncoderLayer(
+                    AttentionLayer(
+                        ImprovedClusteredAttention(clusters=10, topk=5),
+                        d_model,
+                        n_heads,
                     ),
                     d_model,
-                    n_heads
-                ),
-                d_model,
-                n_heads
-            )
-            for i in range(6)
-        ])
+                    n_heads,
+                )
+                for _ in range(6)
+            ]
+        )
+
         transformer = transformer.to("cuda")
         x = torch.rand(100, 20, d_model).to("cuda")
         y = transformer(x)
@@ -44,29 +44,32 @@ class TestTransformerEncoder(unittest.TestCase):
     def test_topk_equals_length_attention(self):
         d_model = 32
         n_heads = 4
-        improved_transformer = TransformerEncoder([
-            TransformerEncoderLayer(
-                AttentionLayer(
-                    ImprovedClusteredAttention(
-                        clusters=10,
-                        topk=20
+        improved_transformer = TransformerEncoder(
+            [
+                TransformerEncoderLayer(
+                    AttentionLayer(
+                        ImprovedClusteredAttention(clusters=10, topk=20),
+                        d_model,
+                        n_heads,
                     ),
                     d_model,
-                    n_heads
-                ),
-                d_model,
-                n_heads
-            )
-            for i in range(6)
-        ])
-        full_transformer = TransformerEncoder([
-            TransformerEncoderLayer(
-                AttentionLayer(FullAttention(), d_model, n_heads),
-                d_model,
-                n_heads
-            )
-            for i in range(6)
-        ])
+                    n_heads,
+                )
+                for _ in range(6)
+            ]
+        )
+
+        full_transformer = TransformerEncoder(
+            [
+                TransformerEncoderLayer(
+                    AttentionLayer(FullAttention(), d_model, n_heads),
+                    d_model,
+                    n_heads,
+                )
+                for _ in range(6)
+            ]
+        )
+
         full_transformer = full_transformer.to("cuda")
         improved_transformer = improved_transformer.to("cuda")
         improved_transformer.load_state_dict(full_transformer.state_dict())
@@ -83,29 +86,32 @@ class TestTransformerEncoder(unittest.TestCase):
     def test_topk_equals_length_attention_masked(self):
         d_model = 32
         n_heads = 4
-        improved_transformer = TransformerEncoder([
-            TransformerEncoderLayer(
-                AttentionLayer(
-                    ImprovedClusteredAttention(
-                        clusters=10,
-                        topk=20
+        improved_transformer = TransformerEncoder(
+            [
+                TransformerEncoderLayer(
+                    AttentionLayer(
+                        ImprovedClusteredAttention(clusters=10, topk=20),
+                        d_model,
+                        n_heads,
                     ),
                     d_model,
-                    n_heads
-                ),
-                d_model,
-                n_heads
-            )
-            for i in range(6)
-        ])
-        full_transformer = TransformerEncoder([
-            TransformerEncoderLayer(
-                AttentionLayer(FullAttention(), d_model, n_heads),
-                d_model,
-                n_heads
-            )
-            for i in range(6)
-        ])
+                    n_heads,
+                )
+                for _ in range(6)
+            ]
+        )
+
+        full_transformer = TransformerEncoder(
+            [
+                TransformerEncoderLayer(
+                    AttentionLayer(FullAttention(), d_model, n_heads),
+                    d_model,
+                    n_heads,
+                )
+                for _ in range(6)
+            ]
+        )
+
         full_transformer = full_transformer.to("cuda")
         improved_transformer = improved_transformer.to("cuda")
         improved_transformer.load_state_dict(full_transformer.state_dict())

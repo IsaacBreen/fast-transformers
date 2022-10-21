@@ -87,8 +87,7 @@ class TestSparseProductCUDA(unittest.TestCase):
             k = 32
             E = 32
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing: N H L S E C k: "
-                       "{} {} {} {} {} {} {}").format(N, H, L, S, E, C, k))
+                print(f"Testing: N H L S E C k: {N} {H} {L} {S} {E} {C} {k}")
 
             Q = torch.randn(N, H, L, E).to(self.device)
             K = torch.randn(N, H, S, E).to(self.device)
@@ -135,8 +134,7 @@ class TestSparseProductCUDA(unittest.TestCase):
         I = 5
         B = 16
 
-        for exp in range(30):
-
+        for _ in range(30):
             C = np.random.randint(10, 500)
             L = np.random.randint(C, 2000)
             E = np.random.randint(10, 128)
@@ -144,8 +142,7 @@ class TestSparseProductCUDA(unittest.TestCase):
             k = np.random.randint(10, 64)
 
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing: N H L S E C k: "
-                       "{} {} {} {} {} {} {}").format(N, H, L, S, E, C, k))
+                print(f"Testing: N H L S E C k: {N} {H} {L} {S} {E} {C} {k}")
             Q = torch.randn(N, H, L, E).to(self.device)
             K = torch.randn(N, H, S, E).to(self.device)
             lengths = torch.full((N,), L, dtype=torch.int32).to(self.device)

@@ -33,8 +33,7 @@ class TestAggregateCPU(unittest.TestCase):
             L = np.random.randint(1, 30) * C
             E = np.random.randint(10, 128)
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing: N H L E C: "
-                       "{} {} {} {} {}").format(N, H, L, E, C))
+                print(f"Testing: N H L E C: {N} {H} {L} {E} {C}")
 
             x = torch.rand((N, H, L, E)).cpu()
             g = (torch.arange(L) % C).view(1, 1, L).repeat(N, H, 1).int().cpu()
@@ -74,8 +73,7 @@ class TestAggregateCPU(unittest.TestCase):
             L = np.random.randint(2, 30) * C
             E = np.random.randint(10, 128)
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing: N H L E C: "
-                       "{} {} {} {} {}").format(N, H, L, E, C))
+                print(f"Testing: N H L E C: {N} {H} {L} {E} {C}")
 
             x = torch.rand((N, H, L, E)).cpu()
             g = (torch.arange(L) % C).view(1, 1, L).repeat(N, H, 1).int().cpu()

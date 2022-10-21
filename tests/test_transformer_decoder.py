@@ -20,14 +20,17 @@ class TestTransformerDecoder(unittest.TestCase):
     def test_full_attention_forward(self):
         d_model = 128
         n_heads = 4
-        transformer = TransformerDecoder([
-            TransformerDecoderLayer(
-                AttentionLayer(FullAttention(), d_model, n_heads),  # self
-                AttentionLayer(FullAttention(), d_model, n_heads),  # cross
-                d_model
-            )
-            for i in range(6)
-        ])
+        transformer = TransformerDecoder(
+            [
+                TransformerDecoderLayer(
+                    AttentionLayer(FullAttention(), d_model, n_heads),  # self
+                    AttentionLayer(FullAttention(), d_model, n_heads),  # cross
+                    d_model,
+                )
+                for _ in range(6)
+            ]
+        )
+
         x = torch.rand(10, 7, d_model)
         mem = torch.rand(10, 12, d_model)
         y = transformer(x, mem)
@@ -57,7 +60,7 @@ class TestTransformerDecoder(unittest.TestCase):
         state = None
         start = time.time()
         with torch.no_grad():
-            for i in range(L):
+            for _ in range(L):
                 x, state = t1(x, memory, memory_lengths, state=state)
         end = time.time()
         print("Softmax attention took", round(end-start, 2), "s")
@@ -66,7 +69,7 @@ class TestTransformerDecoder(unittest.TestCase):
         state = None
         start = time.time()
         with torch.no_grad():
-            for i in range(L):
+            for _ in range(L):
                 x, state = t2(x, memory, memory_lengths, state=state)
         end = time.time()
         print("Linear attention took", round(end-start, 2), "s")

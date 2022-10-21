@@ -238,9 +238,7 @@ class Favor(RandomFourierFeatures):
 
         exp_u1 = torch.exp(u - offset)
         exp_u2 = torch.exp(-u - offset)
-        phi = torch.cat([exp_u1, exp_u2], dim=-1)
-
-        return phi
+        return torch.cat([exp_u1, exp_u2], dim=-1)
 
 
 class GeneralizedRandomFeatures(RandomFourierFeatures):

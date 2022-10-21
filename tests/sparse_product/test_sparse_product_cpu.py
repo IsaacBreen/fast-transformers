@@ -53,7 +53,7 @@ class TestSparseProductCPU(unittest.TestCase):
 
         n_runs = 10
         s = time.time()
-        for run in range(n_runs):
+        for _ in range(n_runs):
             products = sparse_dot_product(
                 X,
                 Y,
@@ -63,11 +63,11 @@ class TestSparseProductCPU(unittest.TestCase):
         t_s = (e - s) / n_runs
 
         s = time.time()
-        for run in range(n_runs):
+        for _ in range(n_runs):
             torch.einsum("nhle,nhse->nhls", X, Y)
         e = time.time()
         t_f = (e - s) / n_runs
-        print("Sparse: {}, Full: {}, F/S: {}".format(t_s, t_f, t_f/t_s))
+        print(f"Sparse: {t_s}, Full: {t_f}, F/S: {t_f / t_s}")
 
 
 if __name__ == "__main__":

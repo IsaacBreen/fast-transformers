@@ -102,11 +102,11 @@ class TestSparseWeightedAverage(unittest.TestCase):
 
         weights = torch.rand(N, H, L, k).to(self.device).requires_grad_(True)
         values = torch.randn(N, H, S, E).to(self.device).requires_grad_(True)
-        
-        attn = torch.randn(N, H, L, S).to(self.device).requires_grad_(False) 
+
+        attn = torch.randn(N, H, L, S).to(self.device).requires_grad_(False)
         topk_v, topk = torch.topk(attn, k, dim=-1)
         topk = topk.contiguous()
-        for i in range(2000):
+        for _ in range(2000):
             output_hat = sparse_weighted_average(weights, values, topk)
 
         s = torch.cuda.Event(enable_timing=True)
@@ -117,7 +117,7 @@ class TestSparseWeightedAverage(unittest.TestCase):
         torch.cuda.synchronize()
         t_sparse = s.elapsed_time(e)
 
-        print('T_sparse Forward:{}'.format(t_sparse))
+        print(f'T_sparse Forward:{t_sparse}')
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_backward(self):
@@ -134,7 +134,7 @@ class TestSparseWeightedAverage(unittest.TestCase):
         attn = torch.randn(N, H, L, S).to(self.device).requires_grad_(False)
         topk_v, topk = torch.topk(attn, k, dim=-1)
         topk = topk.contiguous()
-        for i in range(2000):
+        for _ in range(2000):
             output_hat = sparse_weighted_average(weights, values, topk)
 
         self._zero_grad(weights, values)
@@ -146,7 +146,7 @@ class TestSparseWeightedAverage(unittest.TestCase):
         torch.cuda.synchronize()
         t_sparse = s.elapsed_time(e)
 
-        print('T_sparse Backward:{}'.format(t_sparse))
+        print(f'T_sparse Backward:{t_sparse}')
 
 if __name__ == "__main__":
     unittest.main()

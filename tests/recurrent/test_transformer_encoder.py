@@ -19,22 +19,23 @@ class TestRecurrentTransformerEncoder(unittest.TestCase):
     def test_full_attention_forward(self):
         d_model = 128
         n_heads = 4
-        transformer = RecurrentTransformerEncoder([
-            RecurrentTransformerEncoderLayer(
-                RecurrentAttentionLayer(
-                    RecurrentFullAttention(),
+        transformer = RecurrentTransformerEncoder(
+            [
+                RecurrentTransformerEncoderLayer(
+                    RecurrentAttentionLayer(
+                        RecurrentFullAttention(), d_model, n_heads
+                    ),
                     d_model,
-                    n_heads
-                ),
-                d_model,
-                n_heads
-            )
-            for i in range(6)
-        ])
+                    n_heads,
+                )
+                for _ in range(6)
+            ]
+        )
+
 
         xs = []
         memory = None
-        for i in range(7):
+        for _ in range(7):
             x, memory = transformer(torch.rand(10, d_model), state=memory)
             xs.append(x)
         for i in range(7):
@@ -49,22 +50,23 @@ class TestRecurrentTransformerEncoder(unittest.TestCase):
         d_model = 128
         n_heads = 4
         d_head = d_model // n_heads
-        transformer = RecurrentTransformerEncoder([
-            RecurrentTransformerEncoderLayer(
-                RecurrentAttentionLayer(
-                    RecurrentLinearAttention(d_head),
+        transformer = RecurrentTransformerEncoder(
+            [
+                RecurrentTransformerEncoderLayer(
+                    RecurrentAttentionLayer(
+                        RecurrentLinearAttention(d_head), d_model, n_heads
+                    ),
                     d_model,
-                    n_heads
-                ),
-                d_model,
-                n_heads
-            )
-            for i in range(6)
-        ])
+                    n_heads,
+                )
+                for _ in range(6)
+            ]
+        )
+
 
         xs = []
         memory = None
-        for i in range(7):
+        for _ in range(7):
             x, memory = transformer(torch.rand(10, d_model), state=memory)
             xs.append(x)
         for i in range(7):

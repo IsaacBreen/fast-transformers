@@ -64,7 +64,7 @@ class TestSparseWeightedAverage(unittest.TestCase):
         C = 100
         I = 10
         B = 32
-        for exp in range(30):
+        for _ in range(30):
             N = np.random.randint(1, 6)
             H = np.random.randint(1, 8)
             C = np.random.randint(10, 500)
@@ -74,8 +74,7 @@ class TestSparseWeightedAverage(unittest.TestCase):
             k = np.random.randint(10, 64)
 
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing Masked: N H L S E C k: "
-                       "{} {} {} {} {} {} {}").format(N, H, L, S, E, C, k))
+                print(f"Testing Masked: N H L S E C k: {N} {H} {L} {S} {E} {C} {k}")
 
             Q = torch.randn(N, H, L, E).to(self.device)
             K = torch.randn(N, H, S, E).to(self.device)
@@ -170,7 +169,7 @@ class TestSparseWeightedAverage(unittest.TestCase):
         C = 100
         I = 10
         B = 32
-        for exp in range(30):
+        for _ in range(30):
             N = np.random.randint(1, 3)
             H = np.random.randint(1, 4)
             C = np.random.randint(10, 500)
@@ -180,8 +179,7 @@ class TestSparseWeightedAverage(unittest.TestCase):
             k = np.random.randint(10, 64)
 
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing: N H L S E C k: "
-                       "{} {} {} {} {} {} {}").format(N, H, L, S, E, C, k))
+                print(f"Testing: N H L S E C k: {N} {H} {L} {S} {E} {C} {k}")
 
             Q = torch.randn(N, H, L, E).to(self.device)
             K = torch.randn(N, H, S, E).to(self.device)

@@ -138,7 +138,7 @@ class TestAggregateGPU(unittest.TestCase):
         c = (0.1*torch.ones(C, N, H)).cuda()
         y = torch.zeros((C, N, H, E)).cuda()
 
-        for i in range(2000):
+        for _ in range(2000):
             aggregate_gpu(x, g, c, y)
 
         s = torch.cuda.Event(enable_timing=True)
@@ -149,7 +149,7 @@ class TestAggregateGPU(unittest.TestCase):
         torch.cuda.synchronize()
         t_aggregate = s.elapsed_time(e)
 
-        print('Aggregate Time: {}'.format(t_aggregate))
+        print(f'Aggregate Time: {t_aggregate}')
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_broadcast_benchmark(self):
@@ -165,7 +165,7 @@ class TestAggregateGPU(unittest.TestCase):
         c = (.1*torch.ones(N, H, C)).cuda()
         x = torch.zeros((N, H, L, E)).cuda()
 
-        for i in range(2000):
+        for _ in range(2000):
             broadcast_gpu(y, g, c, x)
 
         s = torch.cuda.Event(enable_timing=True)
@@ -176,7 +176,7 @@ class TestAggregateGPU(unittest.TestCase):
         torch.cuda.synchronize()
         t_broadcast = s.elapsed_time(e)
 
-        print('Broadcast Time: {}'.format(t_broadcast))
+        print(f'Broadcast Time: {t_broadcast}')
 
 
 if __name__ == "__main__":

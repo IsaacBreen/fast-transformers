@@ -19,11 +19,11 @@ class TestCausalProduct(unittest.TestCase):
                 t.grad[...] = 0
 
     def _test_api(self, device):
-        for t in range(10):
-            N = 2
-            H = 4
-            L = 100
-            S = 100
+        N = 2
+        H = 4
+        L = 100
+        S = 100
+        for _ in range(10):
             E = np.random.randint(10, 256)
             M = np.random.randint(10, 256)
             Q = torch.rand(N, H, L, E).to(device).requires_grad_(True)

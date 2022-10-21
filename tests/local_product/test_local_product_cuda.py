@@ -39,10 +39,10 @@ class TestLocalProductCUDA(unittest.TestCase):
             raise unittest.SkipTest("No CUDA available")
 
     def _test_result_forward(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             Q = torch.rand(N, H, L, E).cuda()
             K = torch.rand(N, H, L, E).cuda()
@@ -84,33 +84,27 @@ class TestLocalProductCUDA(unittest.TestCase):
         lengths = torch.full((N,), L, dtype=torch.long).cuda()
 
         # warmup the cache
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["dot"](Q, K, mask, lengths, local_context)
 
         # measure
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["dot"](Q, K, mask, lengths, local_context)
         end.record()
         torch.cuda.synchronize()
-        print("[dot] [{}] GPU time taken: {} (ms)".format(
-            CP,
-            start.elapsed_time(end)
-        ))
+        print(f"[dot] [{CP}] GPU time taken: {start.elapsed_time(end)} (ms)")
 
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
-        for i in range(10):
+        for _ in range(10):
             torch.einsum("nhle,nhse->nhls", Q, K) + mask
         end.record()
         torch.cuda.synchronize()
-        print("[full_dot] [{}] GPU time taken: {} (ms)".format(
-            CP,
-            start.elapsed_time(end)
-        ))
+        print(f"[full_dot] [{CP}] GPU time taken: {start.elapsed_time(end)} (ms)")
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_forward(self):
@@ -119,10 +113,10 @@ class TestLocalProductCUDA(unittest.TestCase):
                 self._test_benchmark_forward(k)
 
     def _test_result_backward(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             Q = torch.rand(N, H, L, E).cuda()
             K = torch.rand(N, H, L, E).cuda()
@@ -170,7 +164,7 @@ class TestLocalProductCUDA(unittest.TestCase):
         grad_in = torch.ones(N, H, L, local_context).cuda()
 
         # warmup the cache
-        for i in range(10):
+        for _ in range(10):
             GQ, GK = self.kernels[CP]["dot_backward"](Q, K, lengths, grad_in,
                                                         local_context)
 
@@ -178,15 +172,12 @@ class TestLocalProductCUDA(unittest.TestCase):
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
-        for i in range(10):
+        for _ in range(10):
             GQ, GK = self.kernels[CP]["dot_backward"](Q, K, lengths, grad_in,
                                                         local_context)
         end.record()
         torch.cuda.synchronize()
-        print("[dot_backward] [{}] GPU time taken: {} (ms)".format(
-            CP,
-            start.elapsed_time(end)
-        ))
+        print(f"[dot_backward] [{CP}] GPU time taken: {start.elapsed_time(end)} (ms)")
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_backward(self):
@@ -195,10 +186,10 @@ class TestLocalProductCUDA(unittest.TestCase):
                 self._test_benchmark_backward(k)
 
     def _test_result_weighted_average(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             local_context = np.random.randint(8, 24)
             A = torch.softmax(torch.randn(N, H, L, local_context), dim=-1).cuda()
@@ -237,21 +228,18 @@ class TestLocalProductCUDA(unittest.TestCase):
         V = torch.rand(N, H, L, E).cuda()
 
         # warmup the cache
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["wa"](A, V)
 
         # measure
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["wa"](A, V)
         end.record()
         torch.cuda.synchronize()
-        print("[wa] [{}] GPU time taken: {} (ms)".format(
-            CP,
-            start.elapsed_time(end)
-        ))
+        print(f"[wa] [{CP}] GPU time taken: {start.elapsed_time(end)} (ms)")
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_weighted_average(self):
@@ -260,10 +248,10 @@ class TestLocalProductCUDA(unittest.TestCase):
                 self._test_benchmark_weighted_average(k)
 
     def _test_result_weighted_average_backward(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             local_context = np.random.randint(8, 24)
             A = torch.softmax(torch.randn(N, H, L, local_context), dim=-1).cuda()
@@ -308,21 +296,18 @@ class TestLocalProductCUDA(unittest.TestCase):
         grad_in = torch.ones(N, H, L, E).cuda()
 
         # warmup the cache
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["wa_backward"](A, V, grad_in)
 
         # measure
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["wa_backward"](A, V, grad_in)
         end.record()
         torch.cuda.synchronize()
-        print("[wa_back] [{}] GPU time taken: {} (ms)".format(
-            CP,
-            start.elapsed_time(end)
-        ))
+        print(f"[wa_back] [{CP}] GPU time taken: {start.elapsed_time(end)} (ms)")
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_weighted_average_backward(self):

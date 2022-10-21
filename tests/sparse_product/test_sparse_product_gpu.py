@@ -81,11 +81,11 @@ class TestSparseProductCUDA(unittest.TestCase):
         X = torch.randn(N, H, L, E).cuda()
         Y = torch.randn(N, H, S, E).cuda()
 
-        A = torch.randn(N, H, L, S).to(X.device).requires_grad_(False) 
+        A = torch.randn(N, H, L, S).to(X.device).requires_grad_(False)
         topk_v, topk = torch.topk(A, k, dim=-1)
         topk = topk.contiguous()
 
-        for i in range(1000):
+        for _ in range(1000):
             products = sparse_dot_product(
                 X,
                 Y,
@@ -103,7 +103,7 @@ class TestSparseProductCUDA(unittest.TestCase):
         e.record()
         torch.cuda.synchronize()
         t_s = s.elapsed_time(e)
-        for i in range(1000):
+        for _ in range(1000):
             torch.einsum("nhle,nhse->nhls", X, Y)
         s = torch.cuda.Event(enable_timing=True)
         e = torch.cuda.Event(enable_timing=True)
@@ -112,7 +112,7 @@ class TestSparseProductCUDA(unittest.TestCase):
         e.record()
         torch.cuda.synchronize()
         t_f = s.elapsed_time(e)
-        print("Sparse: {}, Full: {}, F/S: {}".format(t_s, t_f, t_f/t_s))
+        print(f"Sparse: {t_s}, Full: {t_f}, F/S: {t_f / t_s}")
 
 
 if __name__ == "__main__":

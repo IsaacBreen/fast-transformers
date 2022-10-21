@@ -28,7 +28,7 @@ def generate_hash(n_points, d, b, h):
 def time_clustering(L, N, H, E,
                     n_batches, n_attentions,
                     k, n_buckets, n_iterations, verbose):
-    n_points = L * N * H 
+    n_points = L * N * H
     hashes = torch.zeros(n_points, dtype=torch.int64).cuda()
     hashes = generate_hash(n_points, E, n_buckets, hashes).view(N, H, L)
 
@@ -39,10 +39,10 @@ def time_clustering(L, N, H, E,
     cluster_bit_counts = torch.zeros((N, H, k, n_buckets),
                                      dtype=torch.int32).cuda()
     sequence_lengths = torch.ones((N,), dtype=torch.int32).cuda() * L
-     
+
     start = time.time()
-    for batch_idx in range(int(n_batches)):
-        for attention_idx in range(int(n_attentions)):
+    for _ in range(int(n_batches)):
+        for _ in range(int(n_attentions)):
             #hashes = generate_hash(n_points, E, n_buckets, hashes).view(L, N, H)
             cluster(
                 hashes, sequence_lengths,
@@ -53,7 +53,7 @@ def time_clustering(L, N, H, E,
             )
     end = time.time()
     duration = end - start
-    print("Time Elapsed: {}".format(duration))
+    print(f"Time Elapsed: {duration}")
 
 
 if __name__ == "__main__":
@@ -64,12 +64,12 @@ if __name__ == "__main__":
 
     n_batches = 50000/N
     n_attentions = 3
-    
+
     k = 30
     n_buckets = 31
     n_iterations = 10
     verbose = 0
-    
+
     time_clustering(L, N, H, E,
                     n_batches, n_attentions,
                     k, n_buckets, n_iterations, verbose)

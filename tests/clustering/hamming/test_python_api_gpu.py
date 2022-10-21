@@ -40,8 +40,7 @@ def get_hamming_distances(data, closest_clusters, n_buckets):
     hamming_distance_vectorized = np.vectorize(hamming_distance)
     b_data = binary_repr_vectorized(data, n_buckets+1)
     b_closest_clusters = binary_repr_vectorized(closest_clusters, n_buckets+1)
-    distance = hamming_distance_vectorized(b_data, b_closest_clusters)
-    return distance
+    return hamming_distance_vectorized(b_data, b_closest_clusters)
 
 
 def labels_to_centroids(labels, centroids):
@@ -68,13 +67,13 @@ class TestClusteringGPU(unittest.TestCase):
 
     def test_clustering_convergence(self):
         N=50
-        H=4 
-        E=32 
+        H=4
+        E=32
         n_iterations=10
-    
+
         for n_buckets in range(1, 10):
             if os.getenv("VERBOSE_TESTS", ""):
-                print('Testing convergence for {} bits'.format(n_buckets))
+                print(f'Testing convergence for {n_buckets} bits')
             k = 2**n_buckets
 
             L=k
@@ -90,7 +89,7 @@ class TestClusteringGPU(unittest.TestCase):
                 iterations=n_iterations,
                 bits=n_buckets
             )
-    
+
             distances_np = distances.data.cpu().numpy()
             self.assertEqual(distances_np.sum(), 0)
 
@@ -114,9 +113,9 @@ class TestClusteringGPU(unittest.TestCase):
                                          dtype=torch.int32).cuda()
         sequence_lengths = torch.ones((N,), dtype=torch.int32).cuda() * L
 
-        for i in range(50):
+        for _ in range(50):
             hashes = generate_hash(n_points, E, n_buckets).view(N, H, L).cuda()
-    
+
             cluster(
                 hashes, sequence_lengths,
                 groups=groups, counts=counts, centroids=centroids,
@@ -124,22 +123,22 @@ class TestClusteringGPU(unittest.TestCase):
                 iterations=n_iterations,
                 bits=n_buckets
             )
-    
+
             lengths_np = sequence_lengths.repeat_interleave(H).cpu().numpy()
             hashes_np = hashes.view(N * H, L).cpu().numpy()
             groups_np = groups.view(N * H, L).cpu().numpy()
             distances_np = distances.view(N * H, L).cpu().numpy()
             centroids_np = centroids.view(N * H, k).cpu().numpy()
-    
+
             verify_distances(hashes_np, groups_np, centroids_np,
                              distances_np, n_buckets, lengths_np)
 
     def test_masked_clustering(self):
         N=50
-        H=4 
+        H=4
         L=100
         E=32 
-        
+
         k=20
         n_buckets=31
         n_iterations=20
@@ -153,8 +152,8 @@ class TestClusteringGPU(unittest.TestCase):
         cluster_bit_counts = torch.zeros((N, H, k, n_buckets),
                                          dtype=torch.int32).cuda()
         sequence_lengths = torch.ones((N,), dtype=torch.int32).cuda() * L
-    
-        for i in range(50):
+
+        for _ in range(50):
             hashes = generate_hash(n_points, E, n_buckets).view(N, H, L).cuda()
             sequence_lengths.random_(1, L+1)
 
@@ -175,13 +174,13 @@ class TestClusteringGPU(unittest.TestCase):
 
     def test_masked_clustering_convergence(self):
         N=50
-        H=4 
-        E=32 
+        H=4
+        E=32
         n_iterations=30
-    
+
         for n_buckets in range(1, 10):
             if os.getenv("VERBOSE_TESTS", ""):
-                print('Testing convergence for {} bits'.format(n_buckets))
+                print(f'Testing convergence for {n_buckets} bits')
             k = 2**n_buckets
             L = k + 1
             n_points = L * N * H
@@ -215,16 +214,16 @@ class TestClusteringGPU(unittest.TestCase):
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_clustering(self):
         N=12
-        H=4 
+        H=4
         L=1000
         E=32 
-        
+
         k=100
         n_buckets=63
         n_iterations=10
-        
+
         n_points = L * N * H
-        for n_buckets in range(10, 64):        
+        for n_buckets in range(10, 64):    
             hashes = generate_hash(n_points, E, n_buckets).view(N, H, L).cuda()
             groups = torch.zeros((N, H, L), dtype=torch.int32).cuda()
             counts = torch.zeros((N, H, k), dtype=torch.int32).cuda()
@@ -235,7 +234,7 @@ class TestClusteringGPU(unittest.TestCase):
             sequence_lengths = torch.ones((N,), dtype=torch.int32).cuda() * L
             sequence_lengths.random_(1, L+1)
 
-            for i in range(500):
+            for _ in range(500):
                 cluster(
                     hashes, sequence_lengths,
                     groups=groups, counts=counts, centroids=centroids,
@@ -253,15 +252,12 @@ class TestClusteringGPU(unittest.TestCase):
                 distances=distances, bitcounts=cluster_bit_counts,
                 iterations=n_iterations,
                 bits=n_buckets
-            )   
+            )
             e.record()
             torch.cuda.synchronize()
             t_clustering = s.elapsed_time(e)
 
-            print("Clustering with {} bits took {} time".format(
-                n_buckets,
-                t_clustering)
-            )
+            print(f"Clustering with {n_buckets} bits took {t_clustering} time")
 
 
 if __name__ == "__main__":

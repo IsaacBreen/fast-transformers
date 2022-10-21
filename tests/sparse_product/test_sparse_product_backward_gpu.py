@@ -82,7 +82,7 @@ class TestSparseProductBackward(unittest.TestCase):
             ).long().to(self.device)
 
         self._zero_grad(Q, K)
-        for i in range(2000):
+        for _ in range(2000):
             QK = torch.einsum("nhle,nhse->nhls", Q, K)
             QK.sum().backward()
         self._zero_grad(Q, K)
@@ -97,7 +97,7 @@ class TestSparseProductBackward(unittest.TestCase):
         t_full = s.elapsed_time(e)
 
         self._zero_grad(Q, K)
-        for i in range(2000):
+        for _ in range(2000):
             QK = sparse_dot_product(Q, K, topk)
             QK.sum().backward()
         self._zero_grad(Q, K)
@@ -110,7 +110,7 @@ class TestSparseProductBackward(unittest.TestCase):
         e.record()
         torch.cuda.synchronize()
         t_sparse = s.elapsed_time(e)
-        print("Benchmark Backward: T_Full: {}, T_Sparse: {}".format(t_full, t_sparse))
+        print(f"Benchmark Backward: T_Full: {t_full}, T_Sparse: {t_sparse}")
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_forward_backward(self):
@@ -127,7 +127,7 @@ class TestSparseProductBackward(unittest.TestCase):
             ).long().to(self.device)
 
         self._zero_grad(Q, K)
-        for i in range(2000):
+        for _ in range(2000):
             QK = torch.einsum("nhle,nhse->nhls", Q, K)
             QK.sum().backward()
         self._zero_grad(Q, K)
@@ -142,7 +142,7 @@ class TestSparseProductBackward(unittest.TestCase):
         t_full = s.elapsed_time(e)
 
         self._zero_grad(Q, K)
-        for i in range(2000):
+        for _ in range(2000):
             QK = sparse_dot_product(Q, K, topk)
             QK.sum().backward()
         self._zero_grad(Q, K)
@@ -155,7 +155,7 @@ class TestSparseProductBackward(unittest.TestCase):
         e.record()
         torch.cuda.synchronize()
         t_sparse = s.elapsed_time(e)
-        print("Benchmark Forward-Backward: T_Full: {}, T_Sparse: {}".format(t_full, t_sparse))
+        print(f"Benchmark Forward-Backward: T_Full: {t_full}, T_Sparse: {t_sparse}")
 
 
 if __name__ == "__main__":

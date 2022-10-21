@@ -134,8 +134,7 @@ class TestSparseProductCUDA(unittest.TestCase):
         I = 5
         B = 16
 
-        for exp in range(30):
-
+        for _ in range(30):
             C = np.random.randint(10, 500)
             L = np.random.randint(C, 2000)
             E = np.random.randint(10, 128)
@@ -143,9 +142,7 @@ class TestSparseProductCUDA(unittest.TestCase):
             k = np.random.randint(10, 64)
 
             if os.getenv("VERBOSE_TESTS", ""):
-                print("Testing: N H L S E C k: {} {} {} {} {} {} {}".format(
-                    N, H, L, S, E, C, k
-                ))
+                print(f"Testing: N H L S E C k: {N} {H} {L} {S} {E} {C} {k}")
             Q = torch.randn(N, H, L, E).to(self.device)
             K = torch.randn(N, H, S, E).to(self.device)
             lengths = torch.full((N,), L, dtype=torch.int32).to(self.device)
@@ -225,7 +222,7 @@ class TestSparseProductCUDA(unittest.TestCase):
         products = products_sorted.reshape(-1, k).index_select(0, q_rev_flat)
         products = products.view(N, H, L, k)
 
-        for i in range(1000):
+        for _ in range(1000):
             products_sorted = clustered_sparse_dot_product(
                 s_queries,
                 K,
@@ -253,7 +250,7 @@ class TestSparseProductCUDA(unittest.TestCase):
 
         products_sorted = products_sorted.reshape(-1, k).index_select(0, q_rev_flat).view(N, H, L, k)
         topk = topk.contiguous()
-        print("Sparse_Clustered: {}".format(t_sc))
+        print(f"Sparse_Clustered: {t_sc}")
 
 
 if __name__ == "__main__":

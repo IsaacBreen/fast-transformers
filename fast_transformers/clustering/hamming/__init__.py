@@ -80,8 +80,6 @@ def cluster(
             iterations, bits
         )
 
-        return groups, counts
-
     else:
         if groups is None:
             groups = torch.empty((N, H, L), dtype=torch.int32, device=device)
@@ -111,5 +109,6 @@ def cluster(
             iterations, bits
         )
 
-        return groups, counts
+
+    return groups, counts
         

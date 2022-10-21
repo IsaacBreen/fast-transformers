@@ -216,10 +216,10 @@ class TransformerDecoderLayer(Module):
         L_prime = memory.shape[1]
         x_mask = x_mask or FullMask(L, device=x.device)
         x_length_mask = x_length_mask  or \
-            LengthMask(x.new_full((N,), L, dtype=torch.int64))
+                LengthMask(x.new_full((N,), L, dtype=torch.int64))
         memory_mask = memory_mask or FullMask(L, L_prime, device=x.device)
         memory_length_mask = memory_length_mask or \
-            LengthMask(x.new_full((N,), L_prime, dtype=torch.int64))
+                LengthMask(x.new_full((N,), L_prime, dtype=torch.int64))
 
         # First apply the self attention and add it to the input
         x = x + self.dropout(self.self_attention(
@@ -277,10 +277,10 @@ class TransformerDecoder(Module):
         L_prime = memory.shape[1]
         x_mask = x_mask or FullMask(L, device=x.device)
         x_length_mask = x_length_mask  or \
-            LengthMask(x.new_full((N,), L, dtype=torch.int64))
+                LengthMask(x.new_full((N,), L, dtype=torch.int64))
         memory_mask = memory_mask or FullMask(L, L_prime, device=x.device)
         memory_length_mask = memory_length_mask or \
-            LengthMask(x.new_full((N,), L_prime, dtype=torch.int64))
+                LengthMask(x.new_full((N,), L_prime, dtype=torch.int64))
 
         # Apply all the transformer decoders
         for layer in self.layers:

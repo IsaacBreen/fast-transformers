@@ -128,16 +128,16 @@ class TestClusterCPU(unittest.TestCase):
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_clustering(self):
         N=12
-        H=4 
+        H=4
         L=1000
         E=32 
-        
+
         k=100
         n_buckets=63
         n_iterations=10
-        
+
         n_points = L * N * H
-        for n_buckets in range(10, 64):        
+        for n_buckets in range(10, 64):    
             hashes = generate_hash(n_points, E, n_buckets).view(N, H, L)
             groups = torch.zeros((N, H, L), dtype=torch.int32)
             counts = torch.zeros((N, H, k), dtype=torch.int32)
@@ -147,9 +147,9 @@ class TestClusterCPU(unittest.TestCase):
                                              dtype=torch.int32)
             sequence_lengths = torch.ones((N,), dtype=torch.int32) * L
             sequence_lengths.random_(1, L+1)
-                
+
             s = time.time()
-            for i in range(50):
+            for _ in range(50):
                 cluster(
                     hashes, sequence_lengths,
                     groups=groups, counts=counts, centroids=centroids,
@@ -160,8 +160,7 @@ class TestClusterCPU(unittest.TestCase):
             e = time.time()
             t_clustering = e - s
 
-            print("Clustering with {} bits took {} time".format(n_buckets,
-                                                                t_clustering))
+            print(f"Clustering with {n_buckets} bits took {t_clustering} time")
 
 
 if __name__ == "__main__":

@@ -40,10 +40,10 @@ class TestCausalProductCUDA(unittest.TestCase):
             raise unittest.SkipTest("No CUDA available")
 
     def _test_result_forward(self, CP):
-        for t in range(20):
-            N = 4
-            L = 100
-            H = 10
+        N = 4
+        L = 100
+        H = 10
+        for _ in range(20):
             E = np.random.randint(10, 512)
             M = np.random.randint(10, 512)
             Q = torch.rand(N, H, L, E).cuda()
@@ -59,10 +59,10 @@ class TestCausalProductCUDA(unittest.TestCase):
             self.assertLess(max_relative_error(out2, out), 1e-5)
 
     def _test_result_backward(self, CP):
-        for t in range(20):
-            N = 4
-            L = 100
-            H = 10
+        N = 4
+        L = 100
+        H = 10
+        for _ in range(20):
             E = np.random.randint(10, 512)
             M = np.random.randint(10, 512)
             Q = torch.rand(N, H, L, E).cuda()
@@ -100,14 +100,14 @@ class TestCausalProductCUDA(unittest.TestCase):
             out = torch.rand(N, H, L, M).cuda()
 
             # warmup the cache
-            for i in range(10):
+            for _ in range(10):
                 self.kernels[CP]["forward"](Q, K, V, out)
 
             # measure
             start = torch.cuda.Event(enable_timing=True)
             end = torch.cuda.Event(enable_timing=True)
             start.record()
-            for i in range(10):
+            for _ in range(10):
                 self.kernels[CP]["forward"](Q, K, V, out)
             end.record()
             torch.cuda.synchronize()
@@ -134,14 +134,14 @@ class TestCausalProductCUDA(unittest.TestCase):
             gq, gk, gv = [torch.zeros_like(x) for x in [Q, K, V]]
 
             # warmup the cache
-            for i in range(10):
+            for _ in range(10):
                 self.kernels[CP]["backward"](Q, K, V, go, gq, gk, gv)
 
             # measure
             start = torch.cuda.Event(enable_timing=True)
             end = torch.cuda.Event(enable_timing=True)
             start.record()
-            for i in range(10):
+            for _ in range(10):
                 self.kernels[CP]["backward"](Q, K, V, go, gq, gk, gv)
             end.record()
             torch.cuda.synchronize()
