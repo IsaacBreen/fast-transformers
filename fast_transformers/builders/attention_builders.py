@@ -50,11 +50,11 @@ class BaseAttentionBuilder(BaseBuilder):
 
     def __repr__(self):
         return (
-            "{}.from_kwargs(\n".format(self.__class__.__name__) +
-            "\n".join(["    {}={!r},".format(k, v)
-                       for k, v in self._parameters.items()])[:-1] +
-            "\n)"
-        )
+            f"{self.__class__.__name__}.from_kwargs(\n"
+            + "\n".join(
+                ["    {}={!r},".format(k, v) for k, v in self._parameters.items()]
+            )[:-1]
+        ) + "\n)"
 
     def get(self, attention_type):
         """Construct the attention implementation object and return it.

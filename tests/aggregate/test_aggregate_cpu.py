@@ -124,12 +124,12 @@ class TestAggregateCPU(unittest.TestCase):
         y = torch.zeros((C, N, H, E))
 
         s = time.time()
-        for i in range(100):
+        for _ in range(100):
             aggregate_cpu(x, g, c, y)
         e = time.time()
         t_aggregate = e - s
 
-        print('Aggregate Time: {}'.format(t_aggregate))
+        print(f'Aggregate Time: {t_aggregate}')
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_broadcast_benchmark(self):
@@ -146,12 +146,12 @@ class TestAggregateCPU(unittest.TestCase):
         x = torch.zeros((N, H, L, E))
 
         s = time.time()
-        for i in range(100):
+        for _ in range(100):
             broadcast_cpu(y, g, c, x)
         e = time.time()
         t_broadcast = e - s
 
-        print('Broadcast Time: {}'.format(t_broadcast))
+        print(f'Broadcast Time: {t_broadcast}')
 
 
 if __name__ == "__main__":

@@ -30,10 +30,10 @@ class TestCausalProductCPU(unittest.TestCase):
     }
 
     def _test_result_forward(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             M = np.random.randint(10, 256)
             Q = torch.rand(N, H, L, E)
@@ -49,10 +49,10 @@ class TestCausalProductCPU(unittest.TestCase):
             self.assertLess(max_relative_error(out2, out), 1e-5)
 
     def _test_result_backward(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             M = np.random.randint(10, 256)
             Q = torch.rand(N, H, L, E)
@@ -85,18 +85,15 @@ class TestCausalProductCPU(unittest.TestCase):
         out = torch.rand(N, H, L, M)
 
         # warmup the cache
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["forward"](Q, K, V, out)
 
         # measure
         start = time.time()
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["forward"](Q, K, V, out)
         end = time.time()
-        print("[{}] CPU time taken: {} (ms)".format(
-            CP,
-            (end-start)*1000
-        ))
+        print(f"[{CP}] CPU time taken: {(end - start) * 1000} (ms)")
 
     def _test_benchmark_backward(self, CP):
         N = 10
@@ -111,18 +108,15 @@ class TestCausalProductCPU(unittest.TestCase):
         gq, gk, gv = [torch.zeros_like(x) for x in [Q, K, V]]
 
         # warmup the cache
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["backward"](Q, K, V, go, gq, gk, gv)
 
         # measure
         start = time.time()
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["backward"](Q, K, V, go, gq, gk, gv)
         end = time.time()
-        print("[{}] CPU time taken: {} (ms)".format(
-            CP,
-            (end-start)*1000
-        ))
+        print(f"[{CP}] CPU time taken: {(end - start) * 1000} (ms)")
 
     def test_result_forward(self):
         for k in self.kernels.keys():

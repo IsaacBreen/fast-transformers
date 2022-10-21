@@ -93,7 +93,7 @@ class TestRecurrentFullAttention(unittest.TestCase):
         att = RecurrentFullAttention(softmax_temp=1)
 
         start = time.time()
-        for i in range(100):
+        for _ in range(100):
             v, memory = att(q, k, v, memory)
         end = time.time()
         print("CPU Time taken:", (end-start)*1000, "(ms)")
@@ -116,7 +116,7 @@ class TestRecurrentFullAttention(unittest.TestCase):
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
-        for i in range(100):
+        for _ in range(100):
             v, memory = att(q, k, v, memory)
         end.record()
         torch.cuda.synchronize()

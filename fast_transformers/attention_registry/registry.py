@@ -15,7 +15,7 @@ class Registry(object):
     def register(self, key, class_object, parameter_tuples):
         # register the class if the key is new
         if key in self._classes:
-            raise ValueError("{} is already registered".format(key))
+            raise ValueError(f"{key} is already registered")
         self._classes[key] = class_object
 
         # register the parameters

@@ -125,14 +125,12 @@ class ClusteredAttention(Module):
         """Aggregate the Qs based on the index of cluster they belong to. Make
         sure to allow for gradient propagation backwards from the grouped
         queries to each query."""
-        q_grouped = _GroupQueries.apply(Q, *groups, lengths)
-        return q_grouped
+        return _GroupQueries.apply(Q, *groups, lengths)
 
     def _broadcast_values(self, V, groups, lengths):
         """Broadcast the values back to the correct positions but make sure
         that the gradient flows properly."""
-        V_new = _BroadcastValues.apply(V.contiguous(), *groups, lengths)
-        return V_new
+        return _BroadcastValues.apply(V.contiguous(), *groups, lengths)
 
     def forward(self, queries, keys, values, attn_mask, query_lengths,
                 key_lengths):

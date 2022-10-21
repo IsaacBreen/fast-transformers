@@ -37,8 +37,7 @@ class TestAggregateGPU(unittest.TestCase):
             L = np.random.randint(1, 30) * C
             E = np.random.randint(10, 128)
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing: N H L E C: "
-                       "{} {} {} {} {}").format(N, H, L, E, C))
+                print(f"Testing: N H L E C: {N} {H} {L} {E} {C}")
 
             x = torch.rand((N, H, L, E)).cuda()
             g = (torch.arange(L) % C).view(1, 1, L).repeat(N, H, 1).int().cuda()
@@ -78,8 +77,7 @@ class TestAggregateGPU(unittest.TestCase):
             L = np.random.randint(2, 30) * C
             E = np.random.randint(10, 128)
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing: N H L E C: "
-                       "{} {} {} {} {}").format(N, H, L, E, C))
+                print(f"Testing: N H L E C: {N} {H} {L} {E} {C}")
             x = torch.rand((N, H, L, E)).cuda()
             g = (torch.arange(L) % C).view(1, 1, L).repeat(N, H, 1).int().cuda()
             g[:, :, -C:] = C + 1
@@ -125,7 +123,7 @@ class TestAggregateGPU(unittest.TestCase):
         c = (0.1*torch.ones(N, H, C)).cuda()
         y = torch.zeros((N, H, C, E)).cuda()
 
-        for i in range(2000):
+        for _ in range(2000):
             clustered_aggregate(x, g, c, lengths, y)
 
         s = torch.cuda.Event(enable_timing=True)
@@ -136,7 +134,7 @@ class TestAggregateGPU(unittest.TestCase):
         torch.cuda.synchronize()
         t_aggregate = s.elapsed_time(e)
 
-        print('Aggregate Time: {}'.format(t_aggregate))
+        print(f'Aggregate Time: {t_aggregate}')
 
     # @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     # def test_broadcast_benchmark(self):

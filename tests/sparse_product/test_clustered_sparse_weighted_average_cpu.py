@@ -168,17 +168,17 @@ class TestSparseWeightedAverage(unittest.TestCase):
 
         weights = torch.rand(N, H, L, k).to(self.device).requires_grad_(True)
         values = torch.randn(N, H, S, E).to(self.device).requires_grad_(True)
-       
+
         n_runs = 20
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             output_hat = clustered_sparse_weighted_average(
                 weights, values,
                 topk, groups, counts
             )
         e = time.time()
         t_sparse = (e - s) / n_runs
-        print('T_sparse Forward:{}'.format(t_sparse))
+        print(f'T_sparse Forward:{t_sparse}')
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_small_forward_backward(self):
@@ -212,7 +212,7 @@ class TestSparseWeightedAverage(unittest.TestCase):
         self._zero_grad(weights, values)
         n_runs = 20
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             output_hat = clustered_sparse_weighted_average(
                 weights, values,
                 topk, groups, counts
@@ -220,7 +220,7 @@ class TestSparseWeightedAverage(unittest.TestCase):
             output_hat.sum().backward()
         e = time.time()
         t_sparse = (e - s) / n_runs
-        print('T_sparse Forward Backward:{}'.format(t_sparse))
+        print(f'T_sparse Forward Backward:{t_sparse}')
 
 
 if __name__ == "__main__":

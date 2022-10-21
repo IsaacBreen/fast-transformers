@@ -59,12 +59,12 @@ class TestAFTAttention(unittest.TestCase):
 
         for name, att in zip(["full", "simple"], [att_full, att_simple]):
             # warmup the cache
-            for i in range(10):
+            for _ in range(10):
                 v_new = att(q, k, v, m1, m2, m3)
 
             # measure
             start = time.time()
-            for i in range(10):
+            for _ in range(10):
                 v_new = att(q, k, v, m1, m2, m3)
             end = time.time()
             print("AFT", name, "CPU Time taken:", (end-start)*1000, "(ms)")
@@ -79,14 +79,14 @@ class TestAFTAttention(unittest.TestCase):
 
         for name, att in zip(["full", "simple"], [att_full, att_simple]):
             # warmup the caches
-            for i in range(10):
+            for _ in range(10):
                 v_new = att(q, k, v, m1, m2, m3)
 
             # measure
             start = torch.cuda.Event(enable_timing=True)
             end = torch.cuda.Event(enable_timing=True)
             start.record()
-            for i in range(10):
+            for _ in range(10):
                 v_new = att(q, k, v, m1, m2, m3)
             end.record()
             torch.cuda.synchronize()

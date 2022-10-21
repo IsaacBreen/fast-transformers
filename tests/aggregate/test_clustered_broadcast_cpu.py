@@ -63,9 +63,11 @@ def try_sorted_broadcast(Q, K, V, groups, counts, lengths, Q_grouped_orig):
         V_new, sorted_g.view(N, H, L), counts, factors, V_broadcast
     )
     q_rev_flat = (sorted_rev_gi + q_offset).reshape(-1)
-    V_broadcast_remap = V_sorted_broadcast.reshape(-1, D).index_select(
-        0, q_rev_flat).view(N, H, L, D)
-    return V_broadcast_remap
+    return (
+        V_sorted_broadcast.reshape(-1, D)
+        .index_select(0, q_rev_flat)
+        .view(N, H, L, D)
+    )
 
 
 class TestClusteredBroadcastCPU(unittest.TestCase):
@@ -80,7 +82,7 @@ class TestClusteredBroadcastCPU(unittest.TestCase):
         I = 5
         B = 16
 
-        for exp in range(50):
+        for _ in range(50):
             Q = torch.randn(N, H, L, E).cpu()
             lengths = torch.full((N,), L, dtype=torch.int32).cpu()
             lengths[0] = np.random.randint(C, L+1)
@@ -118,7 +120,7 @@ class TestClusteredBroadcastCPU(unittest.TestCase):
         I = 5
         B = 16
 
-        for exp in range(20):
+        for _ in range(20):
             S = np.random.randint(100, 1000)
             C = np.random.randint(10, 500)
             L = np.random.randint(C, 2000)
@@ -128,8 +130,7 @@ class TestClusteredBroadcastCPU(unittest.TestCase):
                 dtype=torch.int32
             ).cpu()
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Test: N H L S E C: "
-                       "{} {} {} {} {} {}").format(N, H, L, S, E, C))
+                print(f"Test: N H L S E C: {N} {H} {L} {S} {E} {C}")
 
             Q = torch.randn(N, H, L, E).cpu()
             groups, counts = cluster_queries(Q, lengths, C, I, B)

@@ -173,15 +173,12 @@ class ImprovedClusteredCausalAttention(Module):
         A = A * (1. - future_mask.float())
         A = self.dropout(A)
         assert A.is_contiguous()
-        V_new = clustered_sparse_weighted_average(A, V, topk, clusters, counts)
-
-        return V_new
+        return clustered_sparse_weighted_average(A, V, topk, clusters, counts)
 
     def _broadcast_values(self, V, clusters, counts, lengths):
         """Broadcast the values back to the correct positions but make sure
         that the gradient flows properly."""
-        V_new = _BroadcastValues.apply(V.contiguous(), clusters, counts, lengths)
-        return V_new
+        return _BroadcastValues.apply(V.contiguous(), clusters, counts, lengths)
 
     def forward(self, queries, keys, values, attn_mask, query_lengths,
                 key_lengths):

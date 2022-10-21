@@ -159,15 +159,12 @@ class ImprovedClusteredAttention(Module):
         A = A * (1.0 - A_bottomk)
         A = self.dropout(A)
         assert A.is_contiguous()
-        V_new = clustered_sparse_weighted_average(A, V, topk, clusters, counts)
-
-        return V_new
+        return clustered_sparse_weighted_average(A, V, topk, clusters, counts)
 
     def _broadcast_values(self, V, clusters, counts, lengths):
         """Broadcast the values back to the correct positions but make sure
         that the gradient flows properly."""
-        V_new = _BroadcastValues.apply(V.contiguous(), clusters, counts, lengths)
-        return V_new
+        return _BroadcastValues.apply(V.contiguous(), clusters, counts, lengths)
 
     def _bottomk_attention(self, QK, V, clusters, counts, query_lengths, topk, softmax_temp):
         """Return the attention with just the bottomk keys."""

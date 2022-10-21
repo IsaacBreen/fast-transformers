@@ -109,7 +109,7 @@ class TestSparseProductCPU(unittest.TestCase):
 
         n_runs = 10
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             products = clustered_sparse_dot_product(
                 Q,
                 K,
@@ -120,7 +120,7 @@ class TestSparseProductCPU(unittest.TestCase):
             )
         e = time.time()
         t_sc = (e - s) / n_runs
-           
+
         topk_broadcast = broadcast(
             topk.float(),
             groups,
@@ -129,7 +129,7 @@ class TestSparseProductCPU(unittest.TestCase):
         )
 
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             products = sparse_dot_product(
                 Q,
                 K,
@@ -137,13 +137,13 @@ class TestSparseProductCPU(unittest.TestCase):
             )
         e = time.time()
         t_s = (e - s) / n_runs
-        
+
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             torch.einsum("nhle,nhse->nhls", Q, K)
         e = time.time()
         t_f = (e - s) / n_runs
-        print("Sparse_Clustered: {}, Sparse: {}, Full: {}".format(t_sc, t_s, t_f))
+        print(f"Sparse_Clustered: {t_sc}, Sparse: {t_s}, Full: {t_f}")
 
 
 if __name__ == "__main__":

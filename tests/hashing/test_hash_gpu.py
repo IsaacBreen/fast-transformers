@@ -55,7 +55,7 @@ class TestHashGPU(unittest.TestCase):
         h3 = torch.zeros_like(h1)
 
         # Count simple pytorch
-        for i in range(50):
+        for _ in range(50):
             simple_lsh(x, a)
 
         s = torch.cuda.Event(enable_timing=True)
@@ -67,7 +67,7 @@ class TestHashGPU(unittest.TestCase):
         t_simple = s.elapsed_time(e)
 
         # Count simple C++ pytorch
-        for i in range(50):
+        for _ in range(50):
             hash_cuda.compute_hashes(x, a, h2)
 
         s = torch.cuda.Event(enable_timing=True)

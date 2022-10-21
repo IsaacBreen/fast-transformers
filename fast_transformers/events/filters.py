@@ -36,10 +36,7 @@ class EventFilter(object):
             return other
         if isinstance(other, type) and issubclass(other, Event):
             return event_class(other)
-        if callable(other):
-            return CallableEventFilter(other)
-
-        return NotImplemented
+        return CallableEventFilter(other) if callable(other) else NotImplemented
 
     def __and__(self, other):
         other = self._to_event_filter(other)
@@ -100,9 +97,7 @@ class LayerNameEventFilter(EventFilter):
 
     def __call__(self, event):
         name = self._names.get(weakref.ref(event.source), None)
-        if name is None:
-            return False
-        return self._name_filter(name)
+        return False if name is None else self._name_filter(name)
 
 
 def event_class(klass):

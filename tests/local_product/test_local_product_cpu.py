@@ -28,10 +28,10 @@ class TestLocalProductCPU(unittest.TestCase):
     }
 
     def _test_result_forward(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             Q = torch.rand(N, H, L, E)
             K = torch.rand(N, H, L, E)
@@ -62,10 +62,10 @@ class TestLocalProductCPU(unittest.TestCase):
                 self._test_result_forward(k)
 
     def _test_result_backward(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             Q = torch.rand(N, H, L, E)
             K = torch.rand(N, H, L, E)
@@ -112,18 +112,15 @@ class TestLocalProductCPU(unittest.TestCase):
         lengths = torch.full((N,), L, dtype=torch.long)
 
         # warmup the cache
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["dot"](Q, K, mask, lengths, local_context)
 
         # measure
         start = time.time()
-        for i in range(10):
+        for _ in range(10):
             self.kernels[CP]["dot"](Q, K, mask, lengths, local_context)
         end = time.time()
-        print("[{}] CPU time taken: {} (ms)".format(
-            CP,
-            (end-start)*1000
-        ))
+        print(f"[{CP}] CPU time taken: {(end - start) * 1000} (ms)")
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_forward(self):
@@ -132,10 +129,10 @@ class TestLocalProductCPU(unittest.TestCase):
                 self._test_benchmark_forward(k)
 
     def _test_result_weighted_average(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             local_context = np.random.randint(8, 24)
             A = torch.softmax(torch.randn(N, H, L, local_context), dim=-1)
@@ -163,10 +160,10 @@ class TestLocalProductCPU(unittest.TestCase):
                 self._test_result_weighted_average(k)
 
     def _test_result_weighted_average_backward(self, CP):
-        for t in range(10):
-            N = 10
-            L = 100
-            H = 10
+        N = 10
+        L = 100
+        H = 10
+        for _ in range(10):
             E = np.random.randint(10, 256)
             local_context = np.random.randint(8, 24)
             A = torch.softmax(torch.randn(N, H, L, local_context), dim=-1)

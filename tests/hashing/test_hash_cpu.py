@@ -50,27 +50,27 @@ class TestHashCPU(unittest.TestCase):
         h3 = torch.zeros_like(h1)
 
         # Count simple pytorch
-        for i in range(50):
+        for _ in range(50):
             simple_lsh(x, a)
         t = time.time()
-        for i in range(50):
+        for _ in range(50):
             simple_lsh(x, a)
         d1 = time.time()-t
 
         # Count simple C++ pytorch
-        for i in range(50):
+        for _ in range(50):
             hash_cpu.compute_hashes(x, a, h2)
         t = time.time()
-        for i in range(50):
+        for _ in range(50):
             hash_cpu.compute_hashes(x, a, h2)
         d2 = time.time()-t
 
         # Count simple C++ pytorch version 2
-        for i in range(50):
+        for _ in range(50):
             P = torch.einsum("nj,ij->ni", [x, a[:, :-1]])
             hash_cpu.compute_hashes_from_projections(P, h3)
         t = time.time()
-        for i in range(50):
+        for _ in range(50):
             P = torch.einsum("nj,ij->ni", [x, a[:, :-1]])
             hash_cpu.compute_hashes_from_projections(P, h3)
         d3 = time.time()-t

@@ -78,19 +78,19 @@ class TestSparseProductBackward(unittest.TestCase):
             ).long().to(self.device)
         n_runs = 10
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             QK = torch.einsum("nhle,nhse->nhls", Q, K)
             QK.sum()
         e = time.time()
         t_full = (e - s) / n_runs
 
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             QK = sparse_dot_product(Q, K, topk)
             QK.sum()
         e = time.time()
         t_sparse = (e - s) / n_runs
-        print("Benchmark Forward: T_Full: {}, T_Sparse: {}".format(t_full, t_sparse))
+        print(f"Benchmark Forward: T_Full: {t_full}, T_Sparse: {t_sparse}")
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_benchmark_forward_backward(self):
@@ -108,7 +108,7 @@ class TestSparseProductBackward(unittest.TestCase):
         n_runs = 10
         self._zero_grad(Q, K)
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             QK = torch.einsum("nhle,nhse->nhls", Q, K)
             QK.sum().backward()
         e = time.time()
@@ -116,12 +116,12 @@ class TestSparseProductBackward(unittest.TestCase):
 
         self._zero_grad(Q, K)
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             QK = sparse_dot_product(Q, K, topk)
             QK.sum().backward()
         e = time.time()
         t_sparse = (e - s) / n_runs
-        print("Benchmark Forward-Backward: T_Full: {}, T_Sparse: {}".format(t_full, t_sparse))
+        print(f"Benchmark Forward-Backward: T_Full: {t_full}, T_Sparse: {t_sparse}")
 
 
 if __name__ == "__main__":

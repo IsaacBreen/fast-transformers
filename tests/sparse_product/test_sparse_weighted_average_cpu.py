@@ -105,12 +105,12 @@ class TestSparseWeightedAverage(unittest.TestCase):
         topk = topk.contiguous()
         n_runs = 20
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             output_hat = sparse_weighted_average(weights, values, topk)
         e = time.time()
         t_sparse = (e - s) / n_runs
 
-        print('T_sparse Forward:{}'.format(t_sparse))
+        print(f'T_sparse Forward:{t_sparse}')
 
     @unittest.skipUnless(os.getenv("BENCHMARK_TESTS", ""), "no benchmarks")
     def test_small_forward_backward(self):
@@ -129,13 +129,13 @@ class TestSparseWeightedAverage(unittest.TestCase):
         topk = topk.contiguous()
         n_runs = 20
         s = time.time()
-        for i in range(n_runs):
+        for _ in range(n_runs):
             output_hat = sparse_weighted_average(weights, values, topk)
             output_hat.sum().backward()
         e = time.time()
         t_sparse = (e - s) / n_runs
 
-        print('T_sparse Forward Backward:{}'.format(t_sparse))
+        print(f'T_sparse Forward Backward:{t_sparse}')
 
 if __name__ == "__main__":
     unittest.main()

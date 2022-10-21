@@ -56,9 +56,11 @@ def sparse_product(Q, K, groups, topk, counts, lengths):
         s_queries, K, topk, sorted_g.view(N, H, L), counts, lengths
     )
     q_rev_flat = (sorted_rev_gi + q_offset).reshape(-1)
-    products = products_sorted.reshape(-1, k).index_select(
-        0, q_rev_flat).view(N, H, L, k)
-    return products
+    return (
+        products_sorted.reshape(-1, k)
+        .index_select(0, q_rev_flat)
+        .view(N, H, L, k)
+    )
 
 
 class TestSparseProductBackward(unittest.TestCase):
@@ -82,7 +84,7 @@ class TestSparseProductBackward(unittest.TestCase):
         I = 5
         B = 16
 
-        for i in range(30):
+        for _ in range(30):
             C = np.random.randint(10, 500)
             L = np.random.randint(C, 2000)
             E = np.random.randint(10, 128)
@@ -90,8 +92,7 @@ class TestSparseProductBackward(unittest.TestCase):
             k = np.random.randint(10, 64)
 
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing Masked: N H L S E C k: "
-                       "{} {} {} {} {} {} {}").format(N, H, L, S, E, C, k))
+                print(f"Testing Masked: N H L S E C k: {N} {H} {L} {S} {E} {C} {k}")
 
             Q = torch.randn(N, H, L, E).to(self.device).requires_grad_(True)
             K = torch.randn(N, H, S, E).to(self.device).requires_grad_(True)
@@ -202,7 +203,7 @@ class TestSparseProductBackward(unittest.TestCase):
         I = 5
         B = 16
 
-        for exp in range(30):
+        for _ in range(30):
             C = np.random.randint(10, 500)
             L = np.random.randint(C, 2000)
             E = np.random.randint(10, 128)
@@ -210,8 +211,7 @@ class TestSparseProductBackward(unittest.TestCase):
             k = np.random.randint(10, 64)
 
             if os.getenv("VERBOSE_TESTS", ""):
-                print(("Testing: N H L S E C k: "
-                       "{} {} {} {} {} {} {}").format(N, H, L, S, E, C, k))
+                print(f"Testing: N H L S E C k: {N} {H} {L} {S} {E} {C} {k}")
 
             Q = torch.randn(N, H, L, E).to(self.device)
             K = torch.randn(N, H, S, E).to(self.device)
@@ -253,13 +253,11 @@ class TestSparseProductBackward(unittest.TestCase):
                 torch.abs(QK_selected - QK_selected_hat).max(),
                 1e-4
             )
-            i = 0
             for g1, g2 in zip(grad, grad_hat):
                 self.assertLess(
                     torch.abs(g1 - g2).max(),
                     1e-3
                 )
-                i += 1
 
 
 if __name__ == "__main__":

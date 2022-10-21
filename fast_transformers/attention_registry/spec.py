@@ -58,9 +58,7 @@ class Choice(Spec):
         return "Choice({!r})".format(self._choices)
 
     def __eq__(self, x):
-        if isinstance(x, Choice):
-            return self._choices == x._choices
-        return False
+        return self._choices == x._choices if isinstance(x, Choice) else False
 
 
 class _Callable(Spec):
@@ -106,9 +104,7 @@ class Optional(Spec):
         return "Optional[{!r}, {!r}]".format(self._other_spec, self._default)
 
     def get(self, x):
-        if x is None:
-            return self._default
-        return self._other_spec.get(x)
+        return self._default if x is None else self._other_spec.get(x)
 
     def __eq__(self, x):
         if isinstance(x, Optional):

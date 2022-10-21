@@ -54,8 +54,7 @@ class ReformerAttention(Module):
 
     def _normalize(self, x):
         norms = torch.sqrt(torch.einsum("nlhe,nlhe->nlh", x, x))
-        x_normed = x / norms.unsqueeze(-1)
-        return x_normed
+        return x / norms.unsqueeze(-1)
 
     def _look_back(self, x):
         xshape = x.shape
@@ -132,8 +131,8 @@ class ReformerAttention(Module):
         # Create the mask
         mask = key_lengths.additive_matrix.unsqueeze(1).expand(N, L, L)
         if self.masked:
-            mask = mask + torch.eye(L, device=queries.device).unsqueeze(0)*float(-1e9)
-       
+            mask = mask + torch.eye(L, device=queries.device).unsqueeze(0) * -1000000000.0
+
         if not attn_mask.all_ones:
             mask = mask + attn_mask.additive_matrix.unsqueeze(0)
         # Get normalized Queries as Keys
@@ -143,9 +142,9 @@ class ReformerAttention(Module):
 
         V_new = 0
         factor = 1/self.rounds
-        for i in range(self.rounds):
+        for _ in range(self.rounds):
             V_new = V_new + \
-                    factor * self._reformer_round(queries, K, values, mask, softmax_temp)
+                        factor * self._reformer_round(queries, K, values, mask, softmax_temp)
 
         return V_new
 
